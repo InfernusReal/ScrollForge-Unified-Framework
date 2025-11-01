@@ -356,7 +356,40 @@ export class ScrollScriptServerAdvanced extends ScrollScriptCore {
    */
   json(res, data, status = 200) {
     res.writeHead(status, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(data));
+    
+    // Handle circular references safely
+    try {
+      res.end(JSON.stringify(data));
+    } catch (error) {
+      // Circular reference detected - use safe serialization
+      const safeData = this._sanitizeForJSON(data);
+      res.end(JSON.stringify(safeData));
+    }
+  }
+
+  /**
+   * Remove circular references and framework internals from data
+   */
+  _sanitizeForJSON(obj) {
+    const seen = new WeakSet();
+    
+    return JSON.parse(JSON.stringify(obj, (key, value) => {
+      // Skip framework internals
+      if (key === 'server' || key === 'channels' || key === 'router' || 
+          key === 'sessions' || key.startsWith('_')) {
+        return undefined;
+      }
+      
+      // Handle circular references
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return '[Circular]';
+        }
+        seen.add(value);
+      }
+      
+      return value;
+    }));
   }
 
   html(res, content, status = 200) {
