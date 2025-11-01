@@ -3413,6 +3413,129 @@ state = {
 
 ## 🐛 Troubleshooting
 
+### **Issue: Input field causes page to refresh/flicker**
+
+**Problem:** Typing in input field makes entire page refresh on every keystroke
+
+**Cause:** Input value is bound to state, causing re-render on every change
+
+**Example of problem:**
+```javascript
+ScrollMesh(
+  ({ inputValue }) => `<input value="${inputValue}">`, // ❌ BAD!
+  
+  (events, state) => {
+    events.on('input', 'input', (e) => {
+      state.inputValue = e.target.value; // Triggers re-render!
+    });
+  },
+  
+  () => ({ inputValue: '' })
+);
+
+// What happens:
+// 1. Type 'a'
+// 2. state.inputValue = 'a'
+// 3. State change → re-render
+// 4. Entire component rebuilds
+// 5. Input resets, loses focus
+// 6. Repeat on next keystroke
+```
+
+**Solution 1: Don't bind input value to state (BEST!)**
+```javascript
+ScrollMesh(
+  ({ todos }) => `
+    <input class="new-todo">
+    <!-- No value binding! -->
+  `,
+  
+  (events, state) => {
+    events.on('keydown', '.new-todo', (e) => {
+      if (e.key === 'Enter') {
+        // Only update state when submitting
+        const text = e.target.value;
+        state.todos = [...state.todos, { text }];
+        
+        // Clear input directly (no state!)
+        e.target.value = '';
+      }
+    });
+  },
+  
+  () => ({ todos: [] })
+  // ✅ No inputValue in state!
+);
+
+// Now: Input smooth, only re-renders when todo added!
+```
+
+**Solution 2: Debounce state updates**
+```javascript
+ScrollMesh(
+  ({ inputValue }) => `<input value="${inputValue}">`,
+  
+  (events, state) => {
+    let timeout;
+    
+    events.on('input', 'input', (e) => {
+      // Don't update immediately
+      clearTimeout(timeout);
+      
+      // Wait 300ms after user stops typing
+      timeout = setTimeout(() => {
+        state.inputValue = e.target.value;
+      }, 300);
+    });
+  },
+  
+  () => ({ inputValue: '' })
+);
+
+// Now: Only re-renders 300ms after typing stops!
+```
+
+**Solution 3: Use uncontrolled inputs**
+```javascript
+ScrollMesh(
+  () => `
+    <form>
+      <input id="my-input">  <!-- Uncontrolled -->
+      <button type="submit">Submit</button>
+    </form>
+  `,
+  
+  (events, state) => {
+    events.on('submit', 'form', (e) => {
+      e.preventDefault();
+      
+      // Get value only when needed
+      const input = document.getElementById('my-input');
+      state.data = input.value;
+      
+      input.value = ''; // Clear
+    });
+  },
+  
+  () => ({ data: '' })
+);
+
+// Input manages its own value, state only updates on submit!
+```
+
+**Why this happens:**
+
+ScrollMesh Context auto-re-renders when state changes. This is:
+- ✅ **GOOD** for displaying data (todos, counts, stats)
+- ❌ **BAD** for form inputs (causes flicker)
+
+**Best Practice:**
+- Use DOM for temporary input values ✅
+- Use state for submitted/saved data ✅
+- Only update state on Enter/Submit/Blur ✅
+
+---
+
 ### **Issue: Component not updating**
 
 **Problem:** State changes but UI doesn't update
