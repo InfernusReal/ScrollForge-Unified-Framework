@@ -33,10 +33,10 @@ export class ModuleSystem {
     const module = this.moduleRegistry.get(name);
     
     if (!module) {
-      throw new Error(\`Module '\${name}' not found\`);
+      throw new Error(`Module '${name}' not found`);
     }
 
-    console.log(\`[ModuleSystem] Loading: \${name}\`);
+    console.log(`[ModuleSystem] Loading: ${name}`);
 
     try {
       const exports = await module.loader();

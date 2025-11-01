@@ -178,7 +178,7 @@ export class GraphVisualizer {
     if (!panel) {
       panel = document.createElement('div');
       panel.id = 'node-info-panel';
-      panel.style.cssText = \`
+      panel.style.cssText = `
         position: fixed;
         bottom: 20px;
         right: 20px;
@@ -189,7 +189,7 @@ export class GraphVisualizer {
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         max-width: 300px;
         z-index: 10000;
-      \`;
+      `;
       document.body.appendChild(panel);
     }
 
