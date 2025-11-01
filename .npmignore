@@ -1,0 +1,11 @@
+src/
+examples/
+node_modules/
+.git/
+.gitignore
+rollup.config.js
+*.log
+.DS_Store
+.vscode/
+.idea/
+

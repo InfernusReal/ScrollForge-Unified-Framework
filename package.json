@@ -1,0 +1,71 @@
+{
+  "name": "scrollforge",
+  "version": "0.4.0",
+  "description": "The Unified Reactive Framework - ScrollScript, ScrollWeave, ScrollMesh",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "type": "module",
+  "bin": {
+    "sf": "./cli/index.js",
+    "scrollforge": "./cli/index.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js"
+    },
+    "./script": {
+      "import": "./dist/script/index.esm.js",
+      "require": "./dist/script/index.js"
+    },
+    "./weave": {
+      "import": "./dist/weave/index.esm.js",
+      "require": "./dist/weave/index.js"
+    },
+    "./mesh": {
+      "import": "./dist/mesh/index.esm.js",
+      "require": "./dist/mesh/index.js"
+    }
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "node --test",
+    "lint": "eslint src/**/*.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "framework",
+    "reactive",
+    "ui",
+    "fullstack",
+    "scrollforge",
+    "scrollscript",
+    "scrollweave",
+    "scrollmesh",
+    "signals",
+    "components",
+    "styling"
+  ],
+  "author": "IA-Labs | Inherited Alteration Systems",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scrollforge/scrollforge"
+  },
+  "bugs": {
+    "url": "https://github.com/scrollforge/scrollforge/issues"
+  },
+  "homepage": "https://github.com/scrollforge/scrollforge#readme",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "eslint": "^8.56.0",
+    "rollup": "^4.9.6"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "acorn": "^8.11.3",
+    "ws": "^8.16.0"
+  }
+}

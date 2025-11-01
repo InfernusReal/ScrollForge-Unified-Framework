@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScrollForge - Advanced HTML Integration</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      padding: 2rem;
+    }
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .demo-box {
+      background: white;
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #667eea;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center; color: #667eea; margin-bottom: 2rem;">
+    ScrollForge HTML Integration - All Modes
+  </h1>
+  
+  <div class="demo-container">
+    <!-- Demo 1: Pure HTML Template -->
+    <div class="demo-box">
+      <h2>1. HTML Template Mode</h2>
+      <div id="demo1"></div>
+    </div>
+    
+    <!-- Demo 2: Pure JavaScript Mode -->
+    <div class="demo-box">
+      <h2>2. JavaScript Object Mode</h2>
+      <div id="demo2"></div>
+    </div>
+    
+    <!-- Demo 3: Mixed Mode -->
+    <div class="demo-box">
+      <h2>3. Mixed HTML + JS Mode</h2>
+      <div id="demo3"></div>
+    </div>
+    
+    <!-- Demo 4: With ScrollWeave -->
+    <div class="demo-box">
+      <h2>4. HTML + Weave Styling</h2>
+      <div id="demo4"></div>
+    </div>
+  </div>
+  
+  <script type="module" src="./advanced.js"></script>
+</body>
+</html>
+
