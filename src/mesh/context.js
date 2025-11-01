@@ -179,6 +179,12 @@ export class ScrollMeshContext {
       },
       
       set(obj, prop, value) {
+        // Skip Symbol properties (like PROXY_FLAG)
+        if (typeof prop === 'symbol') {
+          obj[prop] = value;
+          return true;
+        }
+        
         const isTopLevel = path.length === 0;
         if (self.immutable && !isTopLevel) {
           throw new Error(`Cannot mutate immutable state: ${[...path, prop].join('.')}`);

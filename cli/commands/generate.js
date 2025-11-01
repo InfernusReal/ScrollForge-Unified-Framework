@@ -62,28 +62,28 @@ test('${name}', async () => {
 };
 
 export async function generate(type, name, options) {
-  console.log(\`\\n== Generating \${type}: \${name} ==\\n\`);
+  console.log(`\n== Generating ${type}: ${name} ==\n`);
 
   const template = templates[type];
   
   if (!template) {
-    console.error(\`[!] Unknown type: \${type}\`);
+    console.error(`[!] Unknown type: ${type}`);
     console.log('Available types: component, route, action, signal, test');
     process.exit(1);
   }
 
   const code = template(name);
-  const fileName = \`\${name}.\${type === 'test' ? 'test.js' : 'js'}\`;
+  const fileName = `${name}.${type === 'test' ? 'test.js' : 'js'}`;
   const filePath = path.join(process.cwd(), fileName);
 
   if (fs.existsSync(filePath) && !options.force) {
-    console.error(\`[!] File already exists: \${fileName}\`);
+    console.error(`[!] File already exists: ${fileName}`);
     console.log('Use --force to overwrite');
     process.exit(1);
   }
 
   fs.writeFileSync(filePath, code);
 
-  console.log(\`[ok] Generated: \${fileName}\\n\`);
+  console.log(`[ok] Generated: ${fileName}\n`);
 }
 

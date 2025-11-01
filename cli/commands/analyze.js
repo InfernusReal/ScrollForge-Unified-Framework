@@ -21,7 +21,7 @@ export async function analyze(options) {
 
   // Find all JS files
   const files = findJSFiles(srcDir);
-  console.log(\`Found \${files.length} files\\n\`);
+  console.log(`Found ${files.length} files\n`);
 
   // Analyze each file
   files.forEach(file => {
@@ -38,28 +38,28 @@ export async function analyze(options) {
   const report = analyzer.getReport();
 
   // Display results
-  console.log('[ok] Analysis complete\\n');
-  console.log(\`Modules: \${report.modules}\`);
-  console.log(\`Signals: \${report.totalSignals}\`);
-  console.log(\`Actions: \${report.totalActions}\`);
-  console.log(\`Components: \${report.totalComponents}\`);
+  console.log('[ok] Analysis complete\n');
+  console.log(`Modules: ${report.modules}`);
+  console.log(`Signals: ${report.totalSignals}`);
+  console.log(`Actions: ${report.totalActions}`);
+  console.log(`Components: ${report.totalComponents}`);
 
   // Dead code
   if (report.deadCode.signals.length > 0) {
-    console.log(\`\\n[!] Unused signals: \${report.deadCode.signals.join(', ')}\`);
+    console.log(`\n[!] Unused signals: ${report.deadCode.signals.join(', ')}`);
   }
 
   // Optimizations
   if (report.optimizations.length > 0) {
-    console.log('\\n== Optimization Hints ==\\n');
+    console.log('\n== Optimization Hints ==\n');
     report.optimizations.forEach(hint => {
-      console.log(\`[\${hint.type}] \${hint.message}\`);
+      console.log(`[${hint.type}] ${hint.message}`);
     });
   }
 
   // Find cycles
   if (options.findCycles) {
-    console.log('\\n== Checking for circular dependencies ==\\n');
+    console.log('\n== Checking for circular dependencies ==\n');
     const cycles = findCircularDependencies(analyzer);
 
     if (cycles.length > 0) {
