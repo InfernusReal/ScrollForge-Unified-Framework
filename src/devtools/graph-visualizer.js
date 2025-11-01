@@ -212,7 +212,7 @@ export class GraphVisualizer {
     const positionLabel = document.createElement('strong');
     positionLabel.textContent = 'Position: ';
     positionLine.appendChild(positionLabel);
-    positionLine.append(\`(\${Math.round(node.x)}, \${Math.round(node.y)})\`);
+    positionLine.append(`(${Math.round(node.x)}, ${Math.round(node.y)})`);
     panel.appendChild(positionLine);
 
     const metadataLabel = document.createElement('p');

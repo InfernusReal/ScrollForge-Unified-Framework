@@ -46,7 +46,7 @@ export class ModuleSystem {
 
       return exports;
     } catch (error) {
-      console.error(\`[ModuleSystem] Failed to load \${name}:\`, error);
+      console.error(`[ModuleSystem] Failed to load ${name}:`, error);
       throw error;
     }
   }

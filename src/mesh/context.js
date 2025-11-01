@@ -219,10 +219,6 @@ export class ScrollMeshContext {
           console.log(`[State] ${fullPath} changed:`, oldValue, '->', value);
         }
         
-        if (self.debug.breakOnChange?.includes(prop)) {
-          debugger;
-        }
-        
         if (!self._isRestoring) {
           self._recordSnapshot();
         }
