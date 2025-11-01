@@ -46,8 +46,8 @@ const createClientConfig = (input, outputName) => ({
 
 export default [
   // Original builds (for Node.js)
-  createConfig('src/index.js', 'index', ['http', 'url', 'querystring']),
-  createConfig('src/script/index.js', 'script/index', ['http', 'url', 'querystring']),
+  createConfig('src/index.js', 'index', ['http', 'url', 'querystring', 'ws']),
+  createConfig('src/script/index.js', 'script/index', ['http', 'url', 'querystring', 'ws']),
   createConfig('src/weave/index.js', 'weave/index'),
   createConfig('src/mesh/index.js', 'mesh/index'),
   

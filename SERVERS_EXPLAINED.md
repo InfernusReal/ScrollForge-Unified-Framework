@@ -199,24 +199,277 @@ A full-featured backend server runtime (like Express) with reactive signals and 
 
 ---
 
-### **How to Start:**
+### **THREE Server Versions - Choose Your Power Level:**
 
-**Create:** `server.js`
+| Version | Level | Use When |
+|---------|-------|----------|
+| **ScrollScriptServer** | Basic | Simple APIs, prototypes |
+| **ScrollScriptServerAdvanced** ⭐ | Recommended | Most projects (90%) |
+| **ScrollScriptServerUltimate** | Enterprise | Complex architecture |
 
+---
+
+### **Version 1: ScrollScriptServer (Basic)**
+
+**Import:**
+```javascript
+import { ScrollScriptServer } from 'scrollforge/script';
+```
+
+**Features:**
+- ✅ Basic routing (GET, POST, PUT, DELETE)
+- ✅ Signals
+- ✅ Actions
+- ✅ `autoSync()` for real-time
+- ✅ Middleware (simple)
+- ✅ JSON/HTML helpers
+
+**Missing:**
+- ❌ Route params (`:id`)
+- ❌ Auto body parsing
+- ❌ Sessions
+- ❌ CORS helpers
+- ❌ Validation
+
+**Example:**
+```javascript
+import { ScrollScriptServer } from 'scrollforge/script';
+
+const server = new ScrollScriptServer();
+
+server.signal('count', 0);
+
+server.get('/api/count', (req, res) => {
+  server.json(res, { count: server.get('count') });
+});
+
+server.post('/api/increment', (req, res) => {
+  const count = server.get('count');
+  server.set('count', count + 1);
+  server.json(res, { count: count + 1 });
+});
+
+server.autoSync('count'); // Broadcasts to clients
+
+server.listen(3000);
+```
+
+---
+
+### **Version 2: ScrollScriptServerAdvanced (RECOMMENDED!)** ⭐
+
+**Import:**
+```javascript
+import { ScrollScriptServerAdvanced } from 'scrollforge/script';
+```
+
+**Features:**
+- ✅ Everything from Basic
+- ✅ **Route params** (`/users/:id`)
+- ✅ **Auto body parsing** (JSON, form data)
+- ✅ **Query string parsing**
+- ✅ **Sessions** with cookies
+- ✅ **CORS** helpers
+- ✅ **Rate limiting**
+- ✅ **Built-in validation**
+- ✅ `autoSync()`
+
+**Missing:**
+- ❌ Composable routers
+- ❌ Middleware lanes
+- ❌ Action pipelines
+- ❌ WebSocket channels
+
+**Example:**
+```javascript
+import { ScrollScriptServerAdvanced } from 'scrollforge/script';
+
+const server = new ScrollScriptServerAdvanced();
+
+// Enable features
+server.enableCORS();
+server.useSession({ cookieName: 'my_session' });
+server.rateLimit('/api/users', 10, 60000); // 10 req/min
+
+server.signal('users', []);
+
+// Route with params!
+server.get('/api/users/:id', (req, res) => {
+  const userId = req.params.id; // Auto-extracted!
+  const query = req.query;      // Auto-parsed!
+  
+  const users = server.get('users');
+  const user = users.find(u => u.id === parseInt(userId));
+  
+  server.json(res, { user });
+});
+
+// POST with validation
+const validator = server.validate({
+  name: { required: true, type: 'string' },
+  email: { required: true, pattern: /\S+@\S+/ }
+});
+
+server.post('/api/users', (req, res) => {
+  if (!validator(req, res)) return; // Auto-validates!
+  
+  const body = req.body; // Already parsed!
+  const users = server.get('users');
+  
+  server.set('users', [...users, body]);
+  server.json(res, { user: body }, 201);
+});
+
+server.autoSync('users'); // Real-time sync!
+
+server.listen(3000);
+```
+
+**Why it's best:**
+- ✅ Has all common features
+- ✅ Easy to use
+- ✅ Not too complex
+- ✅ Perfect for 90% of apps
+
+---
+
+### **Version 3: ScrollScriptServerUltimate (Enterprise)**
+
+**Import:**
+```javascript
+import { ScrollScriptServerUltimate } from 'scrollforge/script';
+```
+
+**Features:**
+- ✅ Everything from Advanced
+- ✅ **Composable routers** (nest routers)
+- ✅ **Middleware lanes** (before/after/error)
+- ✅ **Action pipelines** (guard → transform → commit → effect)
+- ✅ **WebSocket channels** (broadcast, presence, replay)
+- ✅ **Dev tools** (hot reload, tracing, testing)
+- ✅ `autoSync()` (v0.4.1+)
+
+**Example:**
 ```javascript
 import { ScrollScriptServerUltimate } from 'scrollforge/script';
 
 const server = new ScrollScriptServerUltimate();
 
-// Your routes here
+// Enable features
+server.enableCORS();
+server.dev({ hotReload: true });
+
+server.signal('users', []);
+
+// Middleware lanes
+server.before('logging', (req, res) => {
+  console.log(`→ ${req.method} ${req.url}`);
+});
+
+server.after('metrics', (req, res) => {
+  console.log(`← ${res.statusCode}`);
+});
+
+server.errorBoundary((error, req, res) => {
+  server.json(res, { error: 'Server error' }, 500);
+  return true;
+});
+
+// Composable routers
+const apiRouter = server.createRouter('/api');
+
+apiRouter.get('/users', (req, res) => {
+  server.json(res, { users: server.get('users') });
+});
+
+apiRouter.get('/users/:id', (req, res) => {
+  const user = server.get('users').find(u => u.id === parseInt(req.params.id));
+  server.json(res, { user });
+});
+
+// Action pipeline
+apiRouter.post('/users', server.pipeline()
+  .guard((payload) => {
+    return payload.req.headers.authorization === 'Bearer token';
+  })
+  .transform((payload) => ({
+    ...payload,
+    body: { ...payload.req.body, id: Date.now() }
+  }))
+  .commit((payload, script) => {
+    const users = script.get('users');
+    script.set('users', [...users, payload.body]);
+    return payload.body;
+  })
+  .effect((user) => {
+    console.log('User created:', user);
+  })
+  .build()
+);
+
+server.use(apiRouter);
+
+// WebSocket channel
+const chat = server.channel('chat', { replayLimit: 50 });
+
+chat.on('MESSAGE', (data, client) => {
+  chat.broadcast('NEW_MESSAGE', {
+    text: data.text,
+    user: data.user,
+    timestamp: Date.now()
+  });
+});
+
+// Auto-sync
+server.autoSync('users');
 
 server.listen(3000);
 ```
 
-**Run:**
-```bash
-node server.js
+**Why use it:**
+- ✅ Maximum features
+- ✅ Enterprise architecture
+- ✅ Complex apps
+- ✅ Large teams
+
+---
+
+## 🎯 Which Server Should You Use?
+
+### **Decision Tree:**
+
 ```
+Do you need composable routers, pipelines, or WebSocket?
+├─ YES → ScrollScriptServerUltimate
+└─ NO → Do you need route params, sessions, or validation?
+    ├─ YES → ScrollScriptServerAdvanced ⭐ (Recommended!)
+    └─ NO → ScrollScriptServer (Basic)
+```
+
+---
+
+### **Quick Comparison:**
+
+| Feature | Basic | Advanced ⭐ | Ultimate |
+|---------|-------|------------|----------|
+| Routing | Simple | ✅ Params | ✅ Composable |
+| Body Parsing | Manual | ✅ Auto | ✅ Auto |
+| Sessions | ❌ | ✅ | ✅ |
+| CORS | Manual | ✅ | ✅ |
+| Validation | Manual | ✅ | ✅ |
+| Rate Limit | ❌ | ✅ | ✅ |
+| autoSync() | ✅ | ✅ | ✅ (v0.4.1+) |
+| Middleware | Basic | Basic | ✅ Lanes |
+| Routers | ❌ | ❌ | ✅ Composable |
+| Pipelines | ❌ | ❌ | ✅ |
+| WebSocket | Basic | Basic | ✅ Channels |
+| Dev Tools | ❌ | ❌ | ✅ |
+
+---
+
+### **How to Start:**
+
+**Create:** `server.js`
 
 ---
 

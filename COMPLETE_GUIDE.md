@@ -1284,6 +1284,157 @@ await deferState.refetch();
 
 ---
 
+### **7. WebSocket Subscriptions with Connection Callbacks**
+
+```javascript
+import { createRequestHelper } from 'scrollforge/mesh';
+
+const requestHelper = app.Script.request;
+
+// Create WebSocket subscription
+const subscription = requestHelper.createSubscription('/ws/chat', {
+  // Called when connected
+  onConnect: () => {
+    console.log('✅ Connected to chat server!');
+    // Update UI, show "online" indicator, etc.
+  },
+  
+  // Called when disconnected
+  onDisconnect: () => {
+    console.log('❌ Disconnected from chat server!');
+    // Update UI, show "offline" indicator, etc.
+  },
+  
+  // Handle incoming messages
+  onMessage: (message) => {
+    console.log('📩 Message received:', message);
+    
+    // Update state
+    const messages = app.Script.get('messages');
+    app.Script.set('messages', [...messages, message]);
+  },
+  
+  // Auto-reconnect on disconnect (default: true)
+  reconnect: true
+});
+
+// Send message through WebSocket
+subscription.send({
+  type: 'CHAT_MESSAGE',
+  text: 'Hello everyone!',
+  user: 'John'
+});
+
+// Close connection when done
+subscription.close();
+```
+
+**Features:**
+- ✅ `onConnect` - Called when WebSocket opens
+- ✅ `onDisconnect` - Called when WebSocket closes
+- ✅ `onMessage` - Called on incoming messages
+- ✅ Auto-reconnect with exponential backoff (up to 10 attempts)
+- ✅ Backoff delays: 1s, 2s, 4s, 8s, 16s, 30s (max)
+- ✅ `send()` - Send messages
+- ✅ `close()` - Manually close connection
+
+**Complete Example with Connection Handling:**
+
+```javascript
+const ChatClient = HTMLScrollMesh(
+  ({ messages, isConnected }) => `
+    <div class="chat">
+      <div class="status ${isConnected ? 'online' : 'offline'}">
+        ${isConnected ? '🟢 Connected' : '🔴 Disconnected'}
+      </div>
+      
+      <div class="messages">
+        ${messages.map(m => `
+          <div class="message">
+            <strong>${m.user}:</strong> ${m.text}
+          </div>
+        `).join('')}
+      </div>
+      
+      <input class="message-input" placeholder="Type message..." />
+      <button class="send-btn" ${!isConnected ? 'disabled' : ''}>
+        Send
+      </button>
+    </div>
+  `,
+  
+  (state, weave) => {
+    // Style based on connection status
+    weave.apply('.status.online', {
+      background: '#10b981',
+      color: 'white',
+      padding: '0.5rem 1rem',
+      borderRadius: '5px'
+    });
+    
+    weave.apply('.status.offline', {
+      background: '#ef4444',
+      color: 'white',
+      padding: '0.5rem 1rem',
+      borderRadius: '5px'
+    });
+  },
+  
+  (events, state) => {
+    // Create WebSocket subscription
+    const ws = app.Script.request.createSubscription('ws://localhost:3000/ws', {
+      onConnect: () => {
+        console.log('Chat connected!');
+        state.isConnected = true;
+      },
+      
+      onDisconnect: () => {
+        console.log('Chat disconnected!');
+        state.isConnected = false;
+      },
+      
+      onMessage: (msg) => {
+        state.messages = [...state.messages, msg];
+      },
+      
+      reconnect: true
+    });
+    
+    // Send message
+    events.on('click', '.send-btn', () => {
+      const input = document.querySelector('.message-input');
+      const text = input.value.trim();
+      
+      if (text && state.isConnected) {
+        ws.send({
+          type: 'MESSAGE',
+          text,
+          user: 'Me'
+        });
+        
+        input.value = '';
+      }
+    });
+  },
+  
+  () => ({
+    messages: [],
+    isConnected: false
+  })
+);
+
+ChatClient.mount('#app');
+```
+
+**This gives you:**
+- ✅ Real-time connection status indicator
+- ✅ Automatic reconnection
+- ✅ UI updates on connect/disconnect
+- ✅ Disabled send button when offline
+- ✅ Complete chat functionality
+
+---
+
 ## 🎨 ScrollWeave - Reactive Styling
 
 ### **1. Apply Styles**
