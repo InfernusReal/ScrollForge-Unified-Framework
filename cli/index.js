@@ -9,8 +9,6 @@ import { program } from 'commander';
 import { createProject } from './commands/create.js';
 import { devServer } from './commands/dev.js';
 import { build } from './commands/build.js';
-import { generate } from './commands/generate.js';
-import { analyze } from './commands/analyze.js';
 
 program
   .name('sf')
@@ -40,19 +38,25 @@ program
   .option('--minify', 'Minify output')
   .action(build);
 
-// Generate command
+// Generate command (lazy load)
 program
   .command('generate <type> <name>')
   .description('Generate component, route, action, signal, or test')
   .option('-f, --force', 'Overwrite existing file')
-  .action(generate);
+  .action(async (type, name, options) => {
+    const { generate } = await import('./commands/generate.js');
+    await generate(type, name, options);
+  });
 
-// Analyze command
+// Analyze command (lazy load)
 program
   .command('analyze')
   .description('Analyze project for optimizations')
   .option('--find-cycles', 'Check for circular dependencies')
-  .action(analyze);
+  .action(async (options) => {
+    const { analyze } = await import('./commands/analyze.js');
+    await analyze(options);
+  });
 
 program.parse();
 

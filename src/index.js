@@ -187,8 +187,6 @@ export { ScrollScriptServer } from './script/server.js';
 export { ScrollWeaveCore } from './weave/core.js';
 export { ScrollMeshCore } from './mesh/core.js';
 
-// Export default instance
-const scrollforge = new ScrollForge();
-
-export default scrollforge;
+// Export the class as default
+export default ScrollForge;
 
