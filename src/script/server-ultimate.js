@@ -260,6 +260,38 @@ export class ScrollScriptServerUltimate extends ScrollScriptCore {
   }
 
   /**
+   * Auto-sync signal to clients
+   */
+  syncToClients(signalName, value = null) {
+    const actualValue = value !== null ? value : this.get(signalName);
+    
+    const message = JSON.stringify({
+      type: 'SIGNAL_SYNC',
+      signal: signalName,
+      value: actualValue,
+      timestamp: Date.now(),
+    });
+
+    if (this.channels && this.channels.wss) {
+      this.channels.wss.clients.forEach((client) => {
+        if (client.readyState === 1) {
+          client.send(message);
+        }
+      });
+    }
+  }
+
+  /**
+   * Auto-sync signal (watch and broadcast)
+   */
+  autoSync(signalName) {
+    this.watch(signalName, (value) => {
+      this.syncToClients(signalName, value);
+    });
+    return this;
+  }
+
+  /**
    * Helper methods
    */
   json(res, data, status = 200) {
