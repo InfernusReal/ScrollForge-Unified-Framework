@@ -67,7 +67,7 @@ export class ModuleSystem {
    */
   unload(name) {
     if (this.coreModules.has(name)) {
-      throw new Error(\`Cannot unload core module: \${name}\`);
+      throw new Error(`Cannot unload core module: ${name}`);
     }
 
     this.loadedModules.delete(name);

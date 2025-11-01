@@ -102,7 +102,7 @@ export class NetHub {
    * Auto wire-up fetch to action
    */
   wireAction(actionType, url, options = {}) {
-    this.script.action(actionType, async (payload) => {
+    this.script.action(actionType, async (_payload) => {
       try {
         const response = await this.fetch.get(url, options);
         

@@ -137,7 +137,7 @@ export class ScrollMeshCore {
   /**
    * Create DOM element from specification
    */
-  _createElementFromSpec(spec, props = {}, children = []) {
+  _createElementFromSpec(spec, _props = {}, children = []) {
     // Handle string (text node)
     if (typeof spec === 'string') {
       return document.createTextNode(spec);

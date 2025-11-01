@@ -149,7 +149,7 @@ export class Router {
    * Convert path to regex with wildcards
    */
   _pathToPattern(path) {
-    const escaped = path.replace(/([.+?^=!:${}()|[\]\/\\])/g, '\\$1');
+    const escaped = path.replace(/([.+?^=!:${}()|[\]/\\])/g, '\\$1');
     const pattern = escaped
       .replace(/\\:(\w+)/g, '(?<$1>[^/]+)')
       .replace(/\\\*/g, '.*');

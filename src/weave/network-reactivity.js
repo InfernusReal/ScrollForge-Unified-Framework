@@ -65,7 +65,7 @@ export class NetworkReactivity {
   _applyLoadingStyles(loading) {
     if (loading) {
       // Show loading indicator
-      const indicator = document.querySelector('.net-loading-indicator') || this._createLoadingIndicator();
+      const _indicator = document.querySelector('.net-loading-indicator') || this._createLoadingIndicator();
       
       this.weave.fadeIn('.net-loading-indicator', 200);
     } else {

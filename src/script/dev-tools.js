@@ -139,7 +139,7 @@ export class DevTools {
   /**
    * Execute route (for testing)
    */
-  async _executeRoute(req, res) {
+  async _executeRoute(req, _res) {
     // This would need to call the server's route matching logic
     // Simplified for now
     console.log(`[Test] Simulating ${req.method} ${req.url}`);
