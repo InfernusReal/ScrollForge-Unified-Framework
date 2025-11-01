@@ -340,6 +340,26 @@ server.listen(3000);
 import { ScrollScriptServerUltimate } from 'scrollforge/script';
 ```
 
+**⚠️ IMPORTANT: WebSocket Channels Requirement**
+
+**If you use WebSocket channels, you MUST install the `ws` package:**
+
+```bash
+npm install ws
+```
+
+**Why:** ScrollScript Server Ultimate includes WebSocket channels for real-time features. The `ws` package is marked as an external dependency (not bundled) to keep the package size small and avoid conflicts.
+
+**If you DON'T need WebSocket:**
+- Use `ScrollScriptServerAdvanced` instead ⭐
+- Or just don't use `server.channel()`
+
+**If you DO need WebSocket:**
+- Install `ws` package first
+- Then use channels freely!
+
+---
+
 **Features:**
 - ✅ Everything from Advanced
 - ✅ **Composable routers** (nest routers)
@@ -464,6 +484,427 @@ Do you need composable routers, pipelines, or WebSocket?
 | Pipelines | ❌ | ❌ | ✅ |
 | WebSocket | Basic | Basic | ✅ Channels |
 | Dev Tools | ❌ | ❌ | ✅ |
+
+---
+
+---
+
+## 📚 Complete Backend Reference
+
+### **ScrollScriptServer (Basic) - Complete API**
+
+---
+
+#### **Installation & Setup**
+
+```bash
+# Install ScrollForge
+npm install scrollforge ws
+
+# Create server.js
+touch server.js
+```
+
+**Minimal Server:**
+```javascript
+import { ScrollScriptServer } from 'scrollforge/script';
+
+const server = new ScrollScriptServer();
+server.listen(3000);
+
+// Server running on http://localhost:3000
+```
+
+---
+
+#### **Core Features:**
+
+**1. Creating Signals (Server State)**
+
+```javascript
+// Simple values
+server.signal('count', 0);
+server.signal('isOnline', true);
+server.signal('serverName', 'My Server');
+
+// Objects
+server.signal('config', {
+  maxConnections: 100,
+  timeout: 30000
+});
+
+// Arrays
+server.signal('users', []);
+server.signal('logs', []);
+
+// With scope
+server.signal('sessionData', {}, 'session');
+```
+
+**2. Getting/Setting Signals**
+
+```javascript
+// Get value
+const count = server.get('count');
+const users = server.get('users');
+
+// Set value
+server.set('count', 42);
+server.set('users', [...users, newUser]);
+
+// Triggers watchers automatically!
+```
+
+**3. Watching Signals**
+
+```javascript
+server.watch('users', (newUsers, oldUsers) => {
+  console.log(`Users changed from ${oldUsers.length} to ${newUsers.length}`);
+});
+
+// Unsubscribe
+const unsubscribe = server.watch('count', callback);
+unsubscribe(); // Stop watching
+```
+
+**4. Actions (Like Events)**
+
+```javascript
+server.action('USER_CREATED', (payload) => {
+  console.log('User created:', payload);
+  
+  const users = server.get('users');
+  server.set('users', [...users, payload.user]);
+});
+
+// Trigger action
+server.trigger('USER_CREATED', { user: { name: 'John' } });
+```
+
+**5. Basic Routing**
+
+```javascript
+// GET route
+server.get('/api/hello', (req, res) => {
+  server.json(res, { message: 'Hello World!' });
+});
+
+// POST route
+server.post('/api/data', (req, res) => {
+  // Note: Body NOT auto-parsed in Basic!
+  let body = '';
+  req.on('data', chunk => body += chunk);
+  req.on('end', () => {
+    const data = JSON.parse(body);
+    server.json(res, { received: data });
+  });
+});
+
+// PUT route
+server.put('/api/update', (req, res) => {
+  server.json(res, { updated: true });
+});
+
+// DELETE route
+server.delete('/api/remove', (req, res) => {
+  server.json(res, { deleted: true });
+});
+```
+
+**6. Simple Middleware**
+
+```javascript
+server.use((req, res) => {
+  console.log(`${req.method} ${req.url}`);
+  // Don't send response, just log
+});
+
+server.use((req, res) => {
+  // Add custom header
+  res.setHeader('X-Powered-By', 'ScrollForge');
+});
+```
+
+**7. Auto-Sync Signals**
+
+```javascript
+server.signal('liveData', { value: 0 });
+
+// Auto-broadcast changes to ALL connected clients!
+server.autoSync('liveData');
+
+// Now any change broadcasts:
+server.set('liveData', { value: 42 });
+// ✨ All WebSocket clients receive update!
+```
+
+**8. Helper Methods**
+
+```javascript
+// JSON response
+server.json(res, { data: 'value' }, 200);
+
+// HTML response
+server.html(res, '<h1>Hello</h1>', 200);
+
+// Get all signals (debugging)
+const signals = server.getAllSignals();
+
+// Get history (time-travel)
+const history = server.getHistory();
+
+// Reset everything
+server.reset();
+```
+
+**9. Graceful Shutdown**
+
+```javascript
+process.on('SIGINT', async () => {
+  await server.shutdown();
+  process.exit(0);
+});
+```
+
+---
+
+#### **Complete Basic Server Example:**
+
+```javascript
+import { ScrollScriptServer } from 'scrollforge/script';
+
+const server = new ScrollScriptServer({ debugMode: true });
+
+// Signals
+server.signal('visitors', 0);
+server.signal('messages', []);
+
+// Middleware
+server.use((req, res) => {
+  console.log(`→ ${req.method} ${req.url}`);
+});
+
+// Routes
+server.get('/', (req, res) => {
+  server.html(res, `
+    <h1>ScrollForge Server</h1>
+    <p>Visitors: ${server.get('visitors')}</p>
+  `);
+});
+
+server.get('/api/visitors', (req, res) => {
+  const visitors = server.get('visitors');
+  server.set('visitors', visitors + 1);
+  server.json(res, { visitors: visitors + 1 });
+});
+
+server.get('/api/messages', (req, res) => {
+  server.json(res, { messages: server.get('messages') });
+});
+
+server.post('/api/messages', (req, res) => {
+  let body = '';
+  req.on('data', chunk => body += chunk);
+  req.on('end', () => {
+    const { text, user } = JSON.parse(body);
+    
+    const messages = server.get('messages');
+    const newMessage = {
+      id: Date.now(),
+      text,
+      user,
+      timestamp: new Date().toISOString()
+    };
+    
+    server.set('messages', [...messages, newMessage]);
+    server.json(res, { message: newMessage }, 201);
+  });
+});
+
+// Auto-sync
+server.autoSync('messages');
+server.autoSync('visitors');
+
+// Start
+server.listen(3000, () => {
+  console.log('Basic server on http://localhost:3000');
+});
+
+// Shutdown
+process.on('SIGINT', async () => {
+  await server.shutdown();
+  process.exit(0);
+});
+```
+
+---
+
+### **ScrollScriptServerAdvanced - Complete API**
+
+---
+
+#### **All Features with Code Examples:**
+
+**1. Route Parameters**
+
+```javascript
+// Single param
+server.get('/users/:id', (req, res) => {
+  const userId = req.params.id; // Auto-extracted!
+  server.json(res, { userId });
+});
+
+// Multiple params
+server.get('/posts/:postId/comments/:commentId', (req, res) => {
+  const { postId, commentId } = req.params;
+  server.json(res, { postId, commentId });
+});
+
+// Optional params with regex
+server.get('/files/*', (req, res) => {
+  // Wildcard route
+  server.json(res, { path: req.url });
+});
+```
+
+**2. Auto Body Parsing**
+
+```javascript
+server.post('/api/users', (req, res) => {
+  const body = req.body; // Already parsed!
+  
+  console.log(body.name);
+  console.log(body.email);
+  
+  // No manual parsing needed!
+  server.json(res, { received: body });
+});
+
+// Supports:
+// - application/json
+// - application/x-www-form-urlencoded
+```
+
+**3. Query String Parsing**
+
+```javascript
+server.get('/api/search', (req, res) => {
+  const query = req.query; // Already parsed!
+  
+  // /api/search?q=test&limit=10
+  console.log(query.q);     // 'test'
+  console.log(query.limit); // '10'
+  
+  server.json(res, { query });
+});
+```
+
+**4. Sessions**
+
+```javascript
+// Enable sessions
+server.useSession({ 
+  cookieName: 'my_session',
+  secret: 'my-secret-key'
+});
+
+// Use in routes
+server.get('/login', (req, res) => {
+  req.session.userId = 123;
+  req.session.username = 'john';
+  
+  server.json(res, { loggedIn: true });
+});
+
+server.get('/profile', (req, res) => {
+  if (!req.session.userId) {
+    server.json(res, { error: 'Not logged in' }, 401);
+    return;
+  }
+  
+  server.json(res, {
+    userId: req.session.userId,
+    username: req.session.username
+  });
+});
+```
+
+**5. CORS**
+
+```javascript
+// Simple CORS
+server.enableCORS();
+
+// Custom CORS
+server.enableCORS({
+  origin: 'http://localhost:8080',
+  methods: 'GET,POST,PUT,DELETE,PATCH',
+  headers: 'Content-Type,Authorization,X-Custom-Header'
+});
+
+// Now cross-origin requests work!
+```
+
+**6. Rate Limiting**
+
+```javascript
+// Limit specific route
+server.rateLimit('/api/login', 5, 60000);
+// 5 requests per minute
+
+server.rateLimit('/api/expensive', 10, 60000);
+// 10 requests per minute
+
+// Auto-blocks with 429 Too Many Requests
+```
+
+**7. Built-in Validation**
+
+```javascript
+const userValidator = server.validate({
+  name: {
+    required: true,
+    type: 'string',
+    min: 2,
+    max: 50
+  },
+  email: {
+    required: true,
+    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  },
+  age: {
+    required: false,
+    type: 'number',
+    min: 18,
+    max: 120
+  }
+});
+
+server.post('/api/users', (req, res) => {
+  // Validate
+  if (!userValidator(req, res)) {
+    // Auto-responds with 400 and error details
+    return;
+  }
+  
+  // If we get here, data is valid!
+  const user = req.body;
+  server.json(res, { user }, 201);
+});
+```
+
+**8. Helper Methods**
+
+```javascript
+// JSON response
+server.json(res, { data: 'value' }, 200);
+
+// HTML response
+server.html(res, '<h1>Hello</h1>', 200);
+
+// Redirect
+server.redirect(res, '/new-location', 302);
+```
 
 ---
 

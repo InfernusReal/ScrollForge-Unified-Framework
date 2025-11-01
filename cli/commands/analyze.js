@@ -5,8 +5,25 @@
 
 import fs from 'fs';
 import path from 'path';
-import { createAnalyzer } from '../../src/compiler/analyzer.js';
-import { createDependencyGraph } from '../../src/compiler/dependency-graph.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Try to import from dist, fallback to src
+let createAnalyzer, createDependencyGraph;
+
+try {
+  // In development (from repo)
+  const analyzer = await import('../../src/compiler/analyzer.js');
+  const depGraph = await import('../../src/compiler/dependency-graph.js');
+  createAnalyzer = analyzer.createAnalyzer;
+  createDependencyGraph = depGraph.createDependencyGraph;
+} catch (e) {
+  // In production (from npm)
+  console.log('[!] Analyze command requires source files (not available in npm package yet)');
+  console.log('This command only works when running from the ScrollForge repository.');
+  process.exit(1);
+}
 
 export async function analyze(options) {
   console.log('\\n== Analyzing ScrollForge project ==\\n');
