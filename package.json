@@ -1,6 +1,6 @@
 {
   "name": "scrollforge",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "description": "The Unified Reactive Framework - ScrollScript, ScrollWeave, ScrollMesh",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -51,10 +51,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/scrollforge/scrollforge"
+    "url": "https://github.com/InfernusReal/ScrollForge-Unified-Framework"
   },
   "bugs": {
-    "url": "https://github.com/scrollforge/scrollforge/issues"
+    "url": "https://github.com/InfernusReal/ScrollForge-Unified-Framework/issues"
   },
   "homepage": "https://www.infernusreal.com",
   "devDependencies": {
