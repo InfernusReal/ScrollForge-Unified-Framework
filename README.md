@@ -1,5 +1,3 @@
-www.infernusreal.com (my portfolio website)
-
 # 🔥 ScrollForge
 
 **The Unified Reactive Framework**
@@ -713,9 +711,7 @@ MIT © IA-Labs | Inherited Alteration Systems
 Created by **Saif Malik** (16 years old, Pakistan)
 
 🌐 **Portfolio:** [www.infernusreal.com](https://www.infernusreal.com)  
-🚀 **NASA Space Apps 2025:** [Team Perseverance5](https://www.spaceappschallenge.org/2025/find-a-team/perseverance5/)  
-💼 **Organization:** IA-Labs | Inherited Alteration Systems  
-🤝 **Sponsored by Mantu** - Unlimited AI access for development
+🚀 **NASA Space Apps 2025:** [Team Perseverance5](https://www.spaceappschallenge.org/2025/find-a-team/perseverance5/)
 
 Built with vision, engineered with excellence.
 
