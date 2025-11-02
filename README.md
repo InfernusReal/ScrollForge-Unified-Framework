@@ -4,7 +4,13 @@ www.infernusreal.com (my portfolio website)
 
 **The Unified Reactive Framework**
 
+[![npm version](https://badge.fury.io/js/scrollforge.svg)](https://www.npmjs.com/package/scrollforge)
+[![Downloads](https://img.shields.io/npm/dm/scrollforge.svg)](https://www.npmjs.com/package/scrollforge)
+[![GitHub](https://img.shields.io/github/stars/InfernusReal/ScrollForge-Unified-Framework?style=social)](https://github.com/InfernusReal/ScrollForge-Unified-Framework)
+
 > "Behavior is structure. Structure is style. Style is logic."
+
+🌐 **[www.infernusreal.com](https://www.infernusreal.com)** - Portfolio & Contact
 
 ScrollForge is a revolutionary full-stack framework that unifies three powerful engines into one coherent system:
 
@@ -704,11 +710,16 @@ MIT © IA-Labs | Inherited Alteration Systems
 
 ## 🙏 Credits
 
-Created by **IA-Labs | Inherited Alteration Systems**
+Created by **Saif Malik** (16 years old, Pakistan)
+
+🌐 **Portfolio:** [www.infernusreal.com](https://www.infernusreal.com)  
+🚀 **NASA Space Apps 2025:** [Team Perseverance5](https://www.spaceappschallenge.org/2025/find-a-team/perseverance5/)  
+💼 **Organization:** IA-Labs | Inherited Alteration Systems  
+🤝 **Sponsored by Mantu** - Unlimited AI access for development
 
 Built with vision, engineered with excellence.
 
-**ScrollForge** - The first language of meaning in motion.
+**ScrollForge** - The first implementation of Causal Graph Programming ✨
 
 ---
 

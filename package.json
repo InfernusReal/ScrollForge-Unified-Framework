@@ -1,6 +1,6 @@
 {
   "name": "scrollforge",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "The Unified Reactive Framework - ScrollScript, ScrollWeave, ScrollMesh",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -47,7 +47,7 @@
     "components",
     "styling"
   ],
-  "author": "IA-Labs | Inherited Alteration Systems",
+  "author": "Saif Malik <contact via www.infernusreal.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -56,7 +56,7 @@
   "bugs": {
     "url": "https://github.com/scrollforge/scrollforge/issues"
   },
-  "homepage": "https://github.com/scrollforge/scrollforge#readme",
+  "homepage": "https://www.infernusreal.com",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
